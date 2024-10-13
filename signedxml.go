@@ -227,16 +227,39 @@ func (s *signatureData) getReferencedXML(reference *etree.Element, inputDoc *etr
 	if uri == "" {
 		outputDoc = inputDoc
 	} else {
-		refIDAttribute := "ID"
-		if s.refIDAttribute != "" {
-			refIDAttribute = s.refIDAttribute
+		// refIDAttribute := "ID"
+		// if s.refIDAttribute != "" {
+		// 	refIDAttribute = s.refIDAttribute
+		// }
+		// path := fmt.Sprintf(".//[@%s='%s']", refIDAttribute, uri)
+		// e := inputDoc.FindElement(path)
+		// if e != nil {
+		// 	outputDoc = etree.NewDocument()
+		// 	outputDoc.SetRoot(e.Copy())
+		// } else {
+		// 	// SAML v1.1 Assertions use AssertionID
+		// 	path := fmt.Sprintf(".//[@AssertionID='%s']", uri)
+		// 	e := inputDoc.FindElement(path)
+		// 	if e != nil {
+		// 		outputDoc = etree.NewDocument()
+		// 		outputDoc.SetRoot(e.Copy())
+		// 	}
+		// }
+
+		refIDAttributes := []string{"ID", "Id", "id"}
+		var e *etree.Element
+		for _, refIDAttribute := range refIDAttributes {
+			if s.refIDAttribute != "" {
+				refIDAttribute = s.refIDAttribute
+			}
+			path := fmt.Sprintf(".//[@%s='%s']", refIDAttribute, uri)
+			e = inputDoc.FindElement(path)
+			if e != nil {
+				outputDoc = etree.NewDocument()
+				outputDoc.SetRoot(e.Copy())
+			}
 		}
-		path := fmt.Sprintf(".//[@%s='%s']", refIDAttribute, uri)
-		e := inputDoc.FindElement(path)
-		if e != nil {
-			outputDoc = etree.NewDocument()
-			outputDoc.SetRoot(e.Copy())
-		} else {
+		if e == nil {
 			// SAML v1.1 Assertions use AssertionID
 			path := fmt.Sprintf(".//[@AssertionID='%s']", uri)
 			e := inputDoc.FindElement(path)
