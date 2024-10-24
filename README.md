@@ -1,6 +1,6 @@
-[![Moov Banner Logo](https://user-images.githubusercontent.com/20115216/104214617-885b3c80-53ec-11eb-8ce0-9fc745fb5bfc.png)](https://github.com/moov-io)
+<!-- [![Moov Banner Logo](https://user-images.githubusercontent.com/20115216/104214617-885b3c80-53ec-11eb-8ce0-9fc745fb5bfc.png)](https://github.com/moov-io) -->
 
-## moov-io/signedxml
+## daugminas/signedxml
 
 [![GoDoc](https://godoc.org/github.com/moov-io/signedxml?status.svg)](https://godoc.org/github.com/moov-io/signedxml)
 [![Build Status](https://github.com/moov-io/signedxml/workflows/Go/badge.svg)](https://github.com/moov-io/signedxml/actions)
@@ -17,7 +17,7 @@ Other packages that provide similar functionality rely on C libraries, which mak
 
 ### Install
 
-`go get github.com/moov-io/signedxml`
+`go get github.com/daugminas/signedxml`
 
 ### Included Algorithms
 
@@ -53,6 +53,57 @@ Other packages that provide similar functionality rely on C libraries, which mak
   - http://www.w3.org/2001/10/xml-exc-c14n#WithComments
 
 ### Examples
+
+### Simple signing of a document with a private key
+
+Three steps:
+1. Insert the to-be-signed document into an XML signature template (this uses an enveloped version)
+
+2. Prepare private key for signing (DER format)
+
+3. Sign the templated document with the private key
+
+Full code:
+```go
+
+  // 0. load inputs
+	templateBytes, e := os.ReadFile("template.xml")
+	if e != nil {
+		panic(e)
+	}
+	targetBytes, e := os.ReadFile("signing_target.xml")
+	if e != nil {
+		panic(e)
+	}
+  keyBytes, e = os.ReadFile("private_key.pem")
+	if e != nil {
+		return
+	}
+
+	// 1. Insert target into the template
+	finalXMLtoBeSigned, e := signedxml.InsertXMLintoSignatureTemplate(string(templateBytes), string(targetBytes), true)
+	if e != nil {
+		panic(e)
+	}
+
+  // 2. Prep the key
+  key, e := signedxml.PrepPKCS8PrivateKey(keyBytes)
+  if e != nil {
+		panic(e)
+	}
+
+  // 3. Sign the document
+	var signer *signedxml.Signer
+	signer, e = signedxml.NewSigner(targetXML)
+	if e != nil {
+		return
+	}
+
+	signedXML, e = signer.Sign(key)
+   if e != nil {
+		panic(e)
+	}
+```
 
 #### Validating signed XML
 If your signed xml contains the signature and certificate, then you can just pass in the xml and call `ValidateReferences()`.
@@ -131,3 +182,7 @@ Contributions are welcome. Just fork the repo and send a pull request.
 ## Releated Projects
 
 - [Moov RTP20022](http://github.com/moov-io/rtp20022) implements ISO20022 messages in Go for Real Time Payments (RTP)
+
+## Additional Information
+
+About xml-sig:(https://www.xml.com/pub/a/2001/08/08/xmldsig.html#xml-sig)

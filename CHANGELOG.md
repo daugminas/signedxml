@@ -1,3 +1,9 @@
+## v1.2.3F (Forked on 2024-10-13)
+
+IMPROVEMENTS
+
+- fix: enable multiple "ID" attribute casing variants detected and properly handled (default "ID", +["Id", "id"])
+
 ## v1.2.2 (Released 2024-06-10)
 
 IMPROVEMENTS
