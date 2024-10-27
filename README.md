@@ -186,3 +186,4 @@ Contributions are welcome. Just fork the repo and send a pull request.
 ## Additional Information
 
 About xml-sig:(https://www.xml.com/pub/a/2001/08/08/xmldsig.html#xml-sig)
+XML-DSIG how-to: https://www.di-mgt.com.au/xmldsig.html

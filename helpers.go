@@ -67,6 +67,41 @@ func InsertXMLintoSignatureTemplate(xmlSignatureTemplate string, xmlToBeInserted
 	return sigDoc.WriteToString()
 }
 
+func InsertTextIntoSignatureTemplate(xmlSignatureTemplate string, text string, unindent bool, addProcessInstructions bool) (out string, e error) {
+
+	// grazinti tuscia stringa, jei nera inputo
+	if xmlSignatureTemplate == "" || text == "" {
+		return
+	}
+
+	// parsinam template
+	sigDoc := etree.NewDocument()
+	if addProcessInstructions {
+		sigDoc.CreateProcInst("xml", `version="1.0" encoding="UTF-8"`)
+	}
+	e = sigDoc.ReadFromString(xmlSignatureTemplate)
+	if e != nil {
+		return
+	}
+	sig := sigDoc.Root()
+	if sig == nil || sig.Tag != "Signature" {
+		return "", errors.New("no root tag present in xmlSignatureTemplate or its root tag is not `Signature`")
+	}
+	obj := sig.FindElement(".//Object")
+	if obj == nil {
+		return "", errors.New("no 'Object' tag found in xmlSignatureTemplate, can't insert xmlToBeInserted")
+	}
+
+	// kabinam texta
+	obj.SetText(text)
+
+	if unindent {
+		sigDoc.Unindent()
+	}
+
+	return sigDoc.WriteToString()
+}
+
 /*
 Decodes private key bytes in the PEM format and parses it into PKCS #8, ASN.1 DER form, which
 then can be used by signer.Sign(key)
