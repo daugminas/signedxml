@@ -340,27 +340,33 @@ func calculateHash(reference *etree.Element, doc *etree.Document) (string, error
 		return "", errors.New("signedxml: unable to find Algorithm in DigestMethod")
 	}
 
-	digestAlgo, ok := HashAlgorithms[digestMethodURI]
-	if !ok {
-		return "", fmt.Errorf("signedxml: unable to find matching hash"+
-			"algorithm for %s in hashAlgorithms", digestMethodURI)
-	}
-
 	doc.WriteSettings.CanonicalEndTags = true
 	doc.WriteSettings.CanonicalText = true
 	doc.WriteSettings.CanonicalAttrVal = true
 
-	h := digestAlgo.New()
 	docBytes, err := doc.WriteToBytes()
 	if err != nil {
 		return "", err
 	}
 
-	h.Write(docBytes)
-	d := h.Sum(nil)
-	calculatedValue := base64.StdEncoding.EncodeToString(d)
+	// return calculatedValue, nil
+	return CalculateHashB64(digestMethodURI, docBytes)
+}
 
-	return calculatedValue, nil
+// helper method for hash (digest) calculation of target bytes. When needed externally.
+func CalculateHashB64(digestMethodURI string, hashTarget []byte) (b64Hash string, e error) {
+	digestAlgo, ok := HashAlgorithms[digestMethodURI]
+	if !ok {
+		return "", fmt.Errorf("signedxml: unable to find matching hash "+
+			"algorithm for %s in HashAlgorithms", digestMethodURI)
+	}
+
+	h := digestAlgo.New()
+	h.Write(hashTarget)
+	d := h.Sum(nil)
+	b64Hash = base64.StdEncoding.EncodeToString(d)
+
+	return
 }
 
 // removeXMLDeclaration searches for and removes the XML declaration processing instruction.
