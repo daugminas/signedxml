@@ -190,3 +190,10 @@ func (v *Validator) loadCertificates() error {
 	}
 	return nil
 }
+
+// if need to override regular certificate loading from signed xml <X509Certificate>, run this prior running Validator.ValidateReferences()
+func (v *Validator) SetCertificates(cert ...*x509.Certificate) {
+	for _, c := range cert {
+		v.Certificates = append(v.Certificates, *c)
+	}
+}
