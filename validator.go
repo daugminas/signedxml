@@ -175,7 +175,7 @@ func (v *Validator) loadCertificates() error {
 	if len(v.Certificates) < 1 {
 		keydata := v.xml.FindElements(".//X509Certificate")
 		for _, key := range keydata {
-			cert, err := getCertFromPEMString(key.Text())
+			cert, err := GetCertFromPEMString(key.Text())
 			if err != nil {
 				log.Printf("signedxml: Unable to load certificate: (%s). "+
 					"Looking for another cert.", err)

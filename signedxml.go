@@ -277,7 +277,8 @@ func (s *signatureData) getReferencedXML(reference *etree.Element, inputDoc *etr
 	return outputDoc, nil
 }
 
-func getCertFromPEMString(pemString string) (*x509.Certificate, error) {
+// Parses PEM string into a X509 certificate
+func GetCertFromPEMString(pemString string) (*x509.Certificate, error) {
 	pubkey := fmt.Sprintf("-----BEGIN PUBLIC KEY-----\n%s\n-----END PUBLIC KEY-----",
 		pemString)
 
