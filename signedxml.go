@@ -15,7 +15,7 @@ import (
 )
 
 func init() {
-	hashAlgorithms = map[string]crypto.Hash{
+	HashAlgorithms = map[string]crypto.Hash{
 		"http://www.w3.org/2001/04/xmldsig-more#md5":    crypto.MD5,
 		"http://www.w3.org/2000/09/xmldsig#sha1":        crypto.SHA1,
 		"http://www.w3.org/2001/04/xmldsig-more#sha224": crypto.SHA224,
@@ -25,7 +25,7 @@ func init() {
 		"http://www.w3.org/2001/04/xmlenc#ripemd160":    crypto.RIPEMD160,
 	}
 
-	signatureAlgorithms = map[string]x509.SignatureAlgorithm{
+	SignatureAlgorithms = map[string]x509.SignatureAlgorithm{
 		"http://www.w3.org/2001/04/xmldsig-more#rsa-md2":      x509.MD2WithRSA,
 		"http://www.w3.org/2001/04/xmldsig-more#rsa-md5":      x509.MD5WithRSA,
 		"http://www.w3.org/2000/09/xmldsig#rsa-sha1":          x509.SHA1WithRSA,
@@ -47,7 +47,7 @@ func init() {
 		"http://www.w3.org/2001/10/xml-exc-c14n#WithComments":   ExclusiveCanonicalization{WithComments: true},
 		dsig.CanonicalXML11AlgorithmId.String():                 &c14N11Canonicalizer{},
 		dsig.CanonicalXML11WithCommentsAlgorithmId.String():     &c14N11Canonicalizer{WithComments: true},
-		dsig.CanonicalXML10RecAlgorithmId.String():              &c14N10RecCanonicalizer{},
+		dsig.CanonicalXML10RecAlgorithmId.String():              &c14N10RecCanonicalizer{}, // DUPLICATE: http://www.w3.org/TR/2001/REC-xml-c14n-20010315
 		dsig.CanonicalXML10WithCommentsAlgorithmId.String():     &c14N10RecCanonicalizer{WithComments: true},
 	}
 }
@@ -89,8 +89,8 @@ type CanonicalizationAlgorithm interface {
 //
 // Custom implementations can be added to the map
 var CanonicalizationAlgorithms map[string]CanonicalizationAlgorithm
-var hashAlgorithms map[string]crypto.Hash
-var signatureAlgorithms map[string]x509.SignatureAlgorithm
+var HashAlgorithms map[string]crypto.Hash
+var SignatureAlgorithms map[string]x509.SignatureAlgorithm
 
 // signatureData provides options for verifying a signed XML document
 type signatureData struct {
@@ -185,7 +185,7 @@ func (s *signatureData) parseSigAlgorithm() error {
 			"SignatureMethod element")
 	}
 
-	sigAlgo, ok := signatureAlgorithms[sigAlgoURI]
+	sigAlgo, ok := SignatureAlgorithms[sigAlgoURI]
 	if ok {
 		s.sigAlgorithm = sigAlgo
 		return nil
@@ -283,10 +283,10 @@ func getCertFromPEMString(pemString string) (*x509.Certificate, error) {
 
 	pemBlock, _ := pem.Decode([]byte(pubkey))
 	if pemBlock == nil {
-		return &x509.Certificate{}, errors.New("Could not parse Public Key PEM")
+		return &x509.Certificate{}, errors.New("could not parse Public Key PEM")
 	}
 	if pemBlock.Type != "PUBLIC KEY" {
-		return &x509.Certificate{}, errors.New("Found wrong key type")
+		return &x509.Certificate{}, errors.New("found wrong key type")
 	}
 
 	cert, err := x509.ParseCertificate(pemBlock.Bytes)
@@ -340,7 +340,7 @@ func calculateHash(reference *etree.Element, doc *etree.Document) (string, error
 		return "", errors.New("signedxml: unable to find Algorithm in DigestMethod")
 	}
 
-	digestAlgo, ok := hashAlgorithms[digestMethodURI]
+	digestAlgo, ok := HashAlgorithms[digestMethodURI]
 	if !ok {
 		return "", fmt.Errorf("signedxml: unable to find matching hash"+
 			"algorithm for %s in hashAlgorithms", digestMethodURI)
