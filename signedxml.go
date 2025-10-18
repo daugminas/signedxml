@@ -279,15 +279,15 @@ func (s *signatureData) getReferencedXML(reference *etree.Element, inputDoc *etr
 
 // Parses PEM string into a X509 certificate
 func GetCertFromPEMString(pemString string) (*x509.Certificate, error) {
-	pubkey := fmt.Sprintf("-----BEGIN PUBLIC KEY-----\n%s\n-----END PUBLIC KEY-----",
+	pubkey := fmt.Sprintf("-----BEGIN CERTIFICATE-----\n%s\n-----END CERTIFICATE-----",
 		pemString)
 
 	pemBlock, _ := pem.Decode([]byte(pubkey))
 	if pemBlock == nil {
 		return &x509.Certificate{}, errors.New("could not parse Public Key PEM")
 	}
-	if pemBlock.Type != "PUBLIC KEY" {
-		return &x509.Certificate{}, errors.New("found wrong key type")
+	if pemBlock.Type != "CERTIFICATE" {
+		return &x509.Certificate{}, errors.New("not a certicate string")
 	}
 
 	cert, err := x509.ParseCertificate(pemBlock.Bytes)
